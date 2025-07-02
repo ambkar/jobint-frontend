@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    command: python main.py
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+    # Если хотите live reload для разработки:
+    # volumes:
+    #   - .:/srv

@@ -1,0 +1,133 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Actay, Arial, sans-serif;
+  background: #f7f9fc;
+}
+
+.flex-container {
+  display: flex;
+  min-height: 100vh;
+  height: 100vh;
+}
+
+.left-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f9fc;
+}
+
+.left-panel img {
+  max-width: 110%;
+  max-height: 100vh;
+}
+
+.right-panel {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brand-title {
+  font-family: "Actay Wide", Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2563eb;
+  margin-bottom: 10px;
+}
+
+.brand-subtitle {
+  font-family: "Actay Wide", Arial, sans-serif;
+  font-size: 1.1rem;
+  color: #374151;
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.form label {
+  font-size: 0.96rem;
+  color: #374151;
+}
+
+.form input[type="text"],
+.form input[type="email"],
+.form input[type="password"],
+.form input[type="file"] {
+  font-family: Actay, Arial, sans-serif;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+.form .forgot-link {
+  display: flex;
+  justify-content: center;
+}
+
+.form .forgot-link a {
+  font-size: 0.95rem;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.form button {
+  font-family: "Actay Wide", Arial, sans-serif;
+  width: 100%;
+  background: #2563eb;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.error-message {
+  color: #e11d48;
+  margin-top: 12px;
+}
+
+.register-link,
+.login-link {
+  margin-top: 24px;
+  font-size: 0.98rem;
+}
+
+.register-link a,
+.login-link a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.copyright {
+  margin-top: 32px;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
