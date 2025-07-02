@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    command: python -m main
+    command: python -m app.main
     restart: unless-stopped
     environment:
       - FLASK_ENV=production
