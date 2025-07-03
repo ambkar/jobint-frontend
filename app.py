@@ -5,6 +5,10 @@ AUTH_API = "https://jobint.ru/api/v1/auth"
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "Welcome to the homepage!"
+
 @app.route("/login", methods=["GET"])
 def login_page():
     return render_template("login.html")
