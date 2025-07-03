@@ -33,7 +33,6 @@ def register_api():
         files['avatar'] = (avatar.filename, avatar, avatar.mimetype)
     resp = requests.post(f"{AUTH_API}/register", data=data, files=files)
 
-
     # Пересылаем запрос на микросервис авторизации
     resp = requests.post(
         f"{AUTH_API}/register",
