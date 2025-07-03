@@ -24,11 +24,11 @@ def register_api():
     # Получаем все поля формы как словарь
     data = request.form.to_dict()
     files = {}
-
-    # Если был аватар — добавляем его к запросу (requests требует кортеж)
     if 'avatar' in request.files and request.files['avatar'].filename:
         avatar = request.files['avatar']
         files['avatar'] = (avatar.filename, avatar, avatar.mimetype)
+    resp = requests.post(f"{AUTH_API}/register", data=data, files=files)
+
 
     # Пересылаем запрос на микросервис авторизации
     resp = requests.post(
