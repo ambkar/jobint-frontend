@@ -21,16 +21,23 @@ def login_api():
 
 @app.route("/auth/register", methods=["POST"])
 def register_api():
+    # Получаем все поля формы как словарь
     data = request.form.to_dict()
     files = {}
 
-    # Если был аватар — добавляем его к запросу
+    # Если был аватар — добавляем его к запросу (requests требует кортеж)
     if 'avatar' in request.files and request.files['avatar'].filename:
         avatar = request.files['avatar']
-        # requests ожидает кортеж: (filename, fileobj, mimetype)
-        files['avatar'] = (avatar.filename, avatar.stream, avatar.mimetype)
+        files['avatar'] = (avatar.filename, avatar, avatar.mimetype)
 
-    resp = requests.post(f"{AUTH_API}/register", data=data, files=files, verify=False)
+    # Пересылаем запрос на микросервис авторизации
+    resp = requests.post(
+        f"{AUTH_API}/register",
+        data=data,
+        files=files if files else None,
+        verify=False
+    )
+    # Возвращаем ответ клиента (статус, тело, заголовки)
     return (resp.text, resp.status_code, resp.headers.items())
 
 if __name__ == "__main__":
