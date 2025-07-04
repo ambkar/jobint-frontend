@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response
-import requests
+from flask import Flask, render_template, request, make_response
 import jwt
+from jwt import ExpiredSignatureError, InvalidTokenError
+import requests
 
 SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
 AUTH_API = "https://jobint.ru/api/v1/auth"
@@ -9,16 +10,15 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def index():
-    # Читаем JWT из cookie
     token = request.cookies.get('access_token')
     user = None
     if token:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            user = payload.get('user_id')  # или другое поле, если нужно
-        except jwt.ExpiredSignatureError:
+            user = payload.get('user_id')
+        except ExpiredSignatureError:
             pass
-        except jwt.InvalidTokenError:
+        except InvalidTokenError:
             pass
 
     if user:
