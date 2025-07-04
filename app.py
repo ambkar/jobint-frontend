@@ -42,7 +42,7 @@ def login_api():
     response = make_response(resp.text, resp.status_code)
     try:
         # Пытаемся получить токен из ответа
-        token = resp.json().get('access_token')
+        token = resp.json().get('token')
         if token:
             # Устанавливаем токен в cookie (httpOnly и secure для безопасности)
             response.set_cookie(
