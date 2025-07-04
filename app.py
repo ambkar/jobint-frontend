@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, make_response
 import requests
 import jwt
 
@@ -9,19 +9,13 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def index():
-    token = None
-    # Получаем токен из заголовка Authorization
-    auth_header = request.headers.get('Authorization')
-    if auth_header and auth_header.startswith('Bearer '):
-        token = auth_header.split(' ')[1]
-    # Если токен хранится в cookie:
-    # token = request.cookies.get('access_token')
-
+    # Читаем JWT из cookie
+    token = request.cookies.get('access_token')
     user = None
     if token:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            user = payload.get('user_id')  # или другое поле
+            user = payload.get('user_id')  # или другое поле, если нужно
         except jwt.ExpiredSignatureError:
             pass
         except jwt.InvalidTokenError:
@@ -43,8 +37,24 @@ def register_page():
 @app.route("/auth/login", methods=["POST"])
 def login_api():
     data = request.json
+    # Проксируем запрос на сервис авторизации
     resp = requests.post(f"{AUTH_API}/login", json=data, verify=False)
-    return (resp.text, resp.status_code, resp.headers.items())
+    response = make_response(resp.text, resp.status_code)
+    try:
+        # Пытаемся получить токен из ответа
+        token = resp.json().get('access_token')
+        if token:
+            # Устанавливаем токен в cookie (httpOnly и secure для безопасности)
+            response.set_cookie(
+                'access_token',
+                token,
+                httponly=True,
+                secure=True,  # Только если у вас HTTPS! Для локальной разработки можно убрать
+                samesite='Lax'
+            )
+    except Exception:
+        pass
+    return response
 
 @app.route("/auth/register", methods=["POST"])
 def register_api():
@@ -54,16 +64,13 @@ def register_api():
     if 'avatar' in request.files and request.files['avatar'].filename:
         avatar = request.files['avatar']
         files['avatar'] = (avatar.filename, avatar, avatar.mimetype)
-    resp = requests.post(f"{AUTH_API}/register", data=data, files=files)
-
-    # Пересылаем запрос на микросервис авторизации
+    # Проксируем запрос на сервис авторизации
     resp = requests.post(
         f"{AUTH_API}/register",
         data=data,
         files=files if files else None,
         verify=False
     )
-    # Возвращаем ответ клиента (статус, тело, заголовки)
     return (resp.text, resp.status_code, resp.headers.items())
 
 if __name__ == "__main__":
