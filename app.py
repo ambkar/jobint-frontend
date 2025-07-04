@@ -50,7 +50,8 @@ def login_api():
                 token,
                 httponly=True,
                 secure=True,  # Только если у вас HTTPS! Для локальной разработки можно убрать
-                samesite='Lax'
+                samesite='Lax',
+                 domain='.jobint.ru'
             )
     except Exception:
         pass
