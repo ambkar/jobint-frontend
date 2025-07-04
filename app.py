@@ -78,8 +78,13 @@ def register_api():
 @app.route("/logout")
 def logout():
     response = redirect(url_for("index"))
-    response.delete_cookie("access_token", domain=".jobint.ru")  # domain укажите тот же, что при установке!
+    response.delete_cookie(
+        "access_token",
+        domain=".jobint.ru",
+        path="/"
+    )
     return response
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
