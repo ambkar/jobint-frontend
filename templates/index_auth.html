@@ -9,12 +9,10 @@
     <li><strong>Отчество:</strong> {{ user.patronymic }}</li>
     <li><strong>Телефон:</strong> {{ user.phone }}</li>
     <li><strong>Email:</strong> {{ user.email }}</li>
-    {% if user.avatar %}
-        <li>
-            <strong>Аватар:</strong><br>
-            <img src="http://jobint.ru/api/v1/auth/avatar/{{ user.id }}" alt="avatar" style="max-width:150px;max-height:150px;">
-        </li>
-    {% endif %}
+    <li>
+        <strong>Аватар:</strong><br>
+        <img src="http://jobint.ru/api/v1/auth/avatar/{{ user.id }}" alt="avatar" style="max-width:150px;max-height:150px;">
+    </li>
 </ul>
 
 
