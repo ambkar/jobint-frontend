@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import requests
 
 AUTH_API = "https://jobint.ru/api/v1/auth"
@@ -6,8 +6,15 @@ AUTH_API = "https://jobint.ru/api/v1/auth"
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
-def home():
-    return render_template("index.html")
+def index():
+    # Проверяем, есть ли информация о пользователе в сессии (или через cookie/JWT)
+    user = session.get('user')
+    if user:
+        # Пользователь авторизован
+        return render_template('index_auth.html', user=user)
+    else:
+        # Пользователь не авторизован
+        return render_template('index.html')
 
 @app.route("/login", methods=["GET"])
 def login_page():
