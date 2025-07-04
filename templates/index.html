@@ -1,5 +1,7 @@
 {% extends "null.html" %}
 {% block title %}Главная{% endblock %}
 {% block content %}
-<a href="{{ url_for('login') }}">Войти</a>
+<a href="{{ url_for('login_page') }}">Войти</a>
+<a href="{{ url_for('register_page') }}">Зарегистрироваться</a>
 {% endblock %}
+
