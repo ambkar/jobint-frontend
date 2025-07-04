@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, redirect, url_for
 import jwt
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 import requests
@@ -74,6 +74,12 @@ def register_api():
         verify=False
     )
     return (resp.text, resp.status_code, resp.headers.items())
+
+@app.route("/logout")
+def logout():
+    response = redirect(url_for("index"))
+    response.delete_cookie("access_token", domain=".jobint.ru")  # domain укажите тот же, что при установке!
+    return response
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
