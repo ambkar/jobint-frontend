@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, make_response
 import jwt
-from jwt import ExpiredSignatureError, InvalidTokenError
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 import requests
 
 SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
