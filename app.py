@@ -1,19 +1,35 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import requests
+import jwt
 
+SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
 AUTH_API = "https://jobint.ru/api/v1/auth"
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def index():
-    # Проверяем, есть ли информация о пользователе в сессии (или через cookie/JWT)
-    user = session.get('user')
+    token = None
+    # Получаем токен из заголовка Authorization
+    auth_header = request.headers.get('Authorization')
+    if auth_header and auth_header.startswith('Bearer '):
+        token = auth_header.split(' ')[1]
+    # Если токен хранится в cookie:
+    # token = request.cookies.get('access_token')
+
+    user = None
+    if token:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            user = payload.get('user_id')  # или другое поле
+        except jwt.ExpiredSignatureError:
+            pass
+        except jwt.InvalidTokenError:
+            pass
+
     if user:
-        # Пользователь авторизован
         return render_template('index_auth.html', user=user)
     else:
-        # Пользователь не авторизован
         return render_template('index.html')
 
 @app.route("/login", methods=["GET"])
