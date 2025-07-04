@@ -15,7 +15,7 @@ def index():
     if token:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            user = payload.get('user_id')
+            user = payload.get('user')  # <-- исправлено тут!
         except ExpiredSignatureError:
             pass
         except InvalidTokenError:
@@ -25,6 +25,7 @@ def index():
         return render_template('index_auth.html', user=user)
     else:
         return render_template('index.html')
+
 
 @app.route("/login", methods=["GET"])
 def login_page():
