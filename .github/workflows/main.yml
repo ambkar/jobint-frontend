@@ -67,7 +67,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} <<'EOSSH'
             set -euo pipefail
-            # Папка проекта на сервере
             cd /var/www/jobint.ru/frontend
             DIR=/var/www/jobint.ru/frontend
             REPO=https://github.com/ambkar/jobint-frontend.git
@@ -79,6 +78,7 @@ jobs:
             fi
 
             cd "$DIR"
-            docker compose pull
+            docker compose build --no-cache
             docker compose up -d --remove-orphans
           EOSSH
+
