@@ -1,35 +1,79 @@
 {% extends "null.html" %}
 {% block title %}Вход{% endblock %}
+{% block head %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/style.css">
+{% endblock %}
 {% block content %}
-<div class="flex-container">
-  <div class="left-panel">
-    <img src="https://www.cryptopolitan.com/wp-content/uploads/2024/01/DALL·E-2024-01-22-12.58.44-A-lifelike-image-of-a-robot-calculating-the-cost-of-GAI-General-Artificial-Intelligence-on-a-calculator-in-an-office-setting.-The-robot-is-designed-.jpg" alt="AI Assistant" />
-  </div>
-  <div class="right-panel">
-    <div class="form-container">
-      <div class="brand-title">HR : Assistant</div>
-      <div class="brand-subtitle">Рады видеть вас снова!</div>
-      <form id="loginForm" class="form">
-        <div>
-          <label for="email">Логин</label>
-          <input type="email" id="email" name="email" required placeholder="Email">
+<div class="container">
+    <div class="block-left">
+        <div class="top-row"></div>
+        <div class="bottom-row">
+            <div class="col-left"></div>
+            <div class="col-center">
+                <div class="jobint-content">
+                    <div class="jobint-title">Jobint</div>
+                    <div class="jobint-subtitle">Виртуальный HR</div>
+                    <div class="jobint-desc">Программный модуль подбора персонала с ИИ</div>
+                    <div class="jobint-steps">
+                      <div class="jobint-step active">
+                          <span class="jobint-step-num">1</span>
+                          <span>Создайте компанию</span>
+                      </div>
+                      <div class="jobint-step">
+                          <span class="jobint-step-num">2</span>
+                          <span>Добавьте вакансии</span>
+                      </div>
+                      <div class="jobint-step">
+                          <span class="jobint-step-num">3</span>
+                          <span>Получите сотрудников</span>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-right"></div>
         </div>
-        <div>
-          <label for="password">Пароль</label>
-          <input type="password" id="password" name="password" required placeholder="Пароль">
+    </div>
+    <div class="block-right">
+        <div class="login-grid">
+            <div></div>
+            <div>
+                <form class="login-form" id="loginForm">
+                    <h1 class="login-title">Вход</h1>
+                    <p class="login-subtitle">
+                        Введите данные профиля или войдите
+                        с помощью сервисов
+                    </p>
+                    <div class="login-socials">
+                        <button type="button" class="login-social">
+                        <img src="/static/images/vk.png" alt="Войти через VK" />
+                        </button>
+                        <button type="button" class="login-social">
+                        <img src="/static/images/sber.png" alt="Войти через sber" />
+                        </button>
+                    </div>
+                    <div class="login-divider">
+                        <div class="login-divider-line"></div>
+                        <span>или</span>
+                        <div class="login-divider-line"></div>
+                    </div>
+                    <label class="login-label" for="email">Email</label>
+                    <input class="login-input" type="email" id="email" name="email" required placeholder="Email" autocomplete="username" />
+                    <label class="login-label" for="password">Пароль</label>
+                    <input class="login-input" type="password" id="password" name="password" required placeholder="Пароль" autocomplete="current-password" />
+                    <button type="button" class="login-link">Восстановить пароль</button>
+                    <button type="submit" class="login-submit">Войти</button>
+                    <div class="login-bottom">
+                        Нет аккаунта?
+                        <a href="#" class="login-register">Зарегистрироваться</a>
+                    </div>
+                </form>
+            </div>
+            <div></div>
         </div>
-        <div class="forgot-link">
-          <a href="/forgot-password">Забыли пароль?</a>
-        </div>
-        <button type="submit">Войти</button>
-      </form>
-      <div id="error" class="error-message"></div>
-      <div class="register-link">
-        Вы здесь впервые? <a href="/register">Зарегистрироваться</a>
-      </div>
     </div>
   </div>
-</div>
+
 <script>
   document.getElementById('loginForm').onsubmit = async function(e) {
     e.preventDefault();
