@@ -1,57 +1,86 @@
 {% extends "null.html" %}
 {% block title %}Регистрация{% endblock %}
 {% block content %}
-<div class="flex-container">
-  <div class="left-panel">
-    <img src="https://www.cryptopolitan.com/wp-content/uploads/2024/01/DALL·E-2024-01-22-12.58.44-A-lifelike-image-of-a-robot-calculating-the-cost-of-GAI-General-Artificial-Intelligence-on-a-calculator-in-an-office-setting.-The-robot-is-designed-.jpg" alt="AI Assistant" />
-  </div>
-  <div class="right-panel">
-    <div class="form-container">
-      <div class="brand-title">HR : Assistant</div>
-      <div class="brand-subtitle">Создайте аккаунт</div>
-      <form id="registerForm" class="form" enctype="multipart/form-data">
-        <div>
-          <label for="name">Имя</label>
-          <input type="text" id="name" name="name" required placeholder="Имя">
+<div class="container">
+    <div class="block-left">
+        <div class="top-row"></div>
+        <div class="bottom-row">
+            <div class="col-left"></div>
+            <div class="col-center">
+                <div class="jobint-content">
+                    <div class="jobint-title">Jobint</div>
+                    <div class="jobint-subtitle">Виртуальный HR</div>
+                    <div class="jobint-desc">Программный модуль подбора персонала с ИИ</div>
+                    <div class="jobint-steps">
+                        <div class="jobint-step active">
+                            <span class="jobint-step-num">1</span>
+                            <span>Создайте аккаунт</span>
+                        </div>
+                        <div class="jobint-step">
+                            <span class="jobint-step-num">2</span>
+                            <span>Заполните профиль</span>
+                        </div>
+                        <div class="jobint-step">
+                            <span class="jobint-step-num">3</span>
+                            <span>Начните подбор</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-right"></div>
         </div>
-        <div>
-          <label for="surname">Фамилия</label>
-          <input type="text" id="surname" name="surname" required placeholder="Фамилия">
-        </div>
-        <div>
-          <label for="patronymic">Отчество</label>
-          <input type="text" id="patronymic" name="patronymic" required placeholder="Отчество">
-        </div>
-        <div>
-          <label for="phone">Телефон</label>
-          <input type="text" id="phone" name="phone" required placeholder="+7 (999) 999-99-99">
-        </div>
-        <div>
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required placeholder="Email">
-        </div>
-        <div>
-          <label for="password">Пароль</label>
-          <input type="password" id="password" name="password" required placeholder="Пароль">
-        </div>
-        <div>
-          <label for="password_confirm">Повторите пароль</label>
-          <input type="password" id="password_confirm" name="password_confirm" required placeholder="Повторите пароль">
-        </div>
-        <div>
-          <label for="avatar">Аватар</label>
-          <input type="file" id="avatar" name="avatar" accept="image/*">
-        </div>
-        <button type="submit">Зарегистрироваться</button>
-      </form>
-      <div id="error" class="error-message"></div>
-      <div class="login-link">
-        Уже зарегистрированы? <a href="/login">Войти</a>
-      </div>
-      <div class="copyright">© HRAssistant 2025</div>
     </div>
-  </div>
+    <div class="block-right">
+        <div class="login-grid">
+            <div></div>
+            <div>
+                <form class="login-form" id="registerForm" enctype="multipart/form-data">
+                    <h1 class="login-title">Регистрация</h1>
+                    <p class="login-subtitle">
+                        Создайте профиль или зарегистрируйтесь с помощью сервисов
+                    </p>
+                    <div class="login-socials">
+                        <button type="button" class="login-social">
+                            <img src="/static/images/vk.png" alt="Зарегистрироваться через VK" />
+                        </button>
+                        <button type="button" class="login-social">
+                            <img src="/static/images/sber.png" alt="Зарегистрироваться через sber" />
+                        </button>
+                    </div>
+                    <div class="login-divider">
+                        <div class="login-divider-line"></div>
+                        <span>или</span>
+                        <div class="login-divider-line"></div>
+                    </div>
+                    <label class="login-label" for="name">Имя</label>
+                    <input class="login-input" type="text" id="name" name="name" required placeholder="Имя" />
+                    <label class="login-label" for="surname">Фамилия</label>
+                    <input class="login-input" type="text" id="surname" name="surname" required placeholder="Фамилия" />
+                    <label class="login-label" for="patronymic">Отчество</label>
+                    <input class="login-input" type="text" id="patronymic" name="patronymic" required placeholder="Отчество" />
+                    <label class="login-label" for="phone">Телефон</label>
+                    <input class="login-input" type="text" id="phone" name="phone" required placeholder="+7 (999) 999-99-99" />
+                    <label class="login-label" for="email">Email</label>
+                    <input class="login-input" type="email" id="email" name="email" required placeholder="Email" autocomplete="username" />
+                    <label class="login-label" for="password">Пароль</label>
+                    <input class="login-input" type="password" id="password" name="password" required placeholder="Пароль" autocomplete="new-password" />
+                    <label class="login-label" for="password_confirm">Повторите пароль</label>
+                    <input class="login-input" type="password" id="password_confirm" name="password_confirm" required placeholder="Повторите пароль" autocomplete="new-password" />
+                    <label class="login-label" for="avatar">Аватар</label>
+                    <input class="login-input" type="file" id="avatar" name="avatar" accept="image/*" />
+                    <div id="error" class="error-message" style="color: #d00; margin-bottom: 10px;"></div>
+                    <button type="submit" class="login-submit">Зарегистрироваться</button>
+                    <div class="login-bottom">
+                        Уже зарегистрированы?
+                        <a href="/login" class="login-register">Войти</a>
+                    </div>
+                </form>
+            </div>
+            <div></div>
+        </div>
+    </div>
 </div>
+
 <script>
   document.getElementById('registerForm').onsubmit = async function(e) {
     e.preventDefault();

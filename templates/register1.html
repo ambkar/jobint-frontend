@@ -1,0 +1,84 @@
+{% extends "null.html" %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<div class="flex-container">
+  <div class="left-panel">
+    <img src="https://www.cryptopolitan.com/wp-content/uploads/2024/01/DALL·E-2024-01-22-12.58.44-A-lifelike-image-of-a-robot-calculating-the-cost-of-GAI-General-Artificial-Intelligence-on-a-calculator-in-an-office-setting.-The-robot-is-designed-.jpg" alt="AI Assistant" />
+  </div>
+  <div class="right-panel">
+    <div class="form-container">
+      <div class="brand-title">HR : Assistant</div>
+      <div class="brand-subtitle">Создайте аккаунт</div>
+      <form id="registerForm" class="form" enctype="multipart/form-data">
+        <div>
+          <label for="name">Имя</label>
+          <input type="text" id="name" name="name" required placeholder="Имя">
+        </div>
+        <div>
+          <label for="surname">Фамилия</label>
+          <input type="text" id="surname" name="surname" required placeholder="Фамилия">
+        </div>
+        <div>
+          <label for="patronymic">Отчество</label>
+          <input type="text" id="patronymic" name="patronymic" required placeholder="Отчество">
+        </div>
+        <div>
+          <label for="phone">Телефон</label>
+          <input type="text" id="phone" name="phone" required placeholder="+7 (999) 999-99-99">
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="Email">
+        </div>
+        <div>
+          <label for="password">Пароль</label>
+          <input type="password" id="password" name="password" required placeholder="Пароль">
+        </div>
+        <div>
+          <label for="password_confirm">Повторите пароль</label>
+          <input type="password" id="password_confirm" name="password_confirm" required placeholder="Повторите пароль">
+        </div>
+        <div>
+          <label for="avatar">Аватар</label>
+          <input type="file" id="avatar" name="avatar" accept="image/*">
+        </div>
+        <button type="submit">Зарегистрироваться</button>
+      </form>
+      <div id="error" class="error-message"></div>
+      <div class="login-link">
+        Уже зарегистрированы? <a href="/login">Войти</a>
+      </div>
+      <div class="copyright">© HRAssistant 2025</div>
+    </div>
+  </div>
+</div>
+<script>
+  document.getElementById('registerForm').onsubmit = async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const password = form.password.value;
+    const password_confirm = form.password_confirm.value;
+    if (password !== password_confirm) {
+      document.getElementById('error').textContent = 'Пароли не совпадают';
+      return;
+    }
+    const formData = new FormData(form);
+    const res = await fetch('/api/v1/auth/register', {
+      method: 'POST',
+      body: formData
+    });
+    let json;
+    try {
+      json = await res.json();
+    } catch (err) {
+      json = {};
+    }
+    if (res.ok && json.token) {
+      localStorage.setItem('jwt_token', json.token);
+      window.location.href = '/';
+    } else {
+      document.getElementById('error').textContent = json.error || 'Ошибка регистрации';
+    }
+  };
+</script>
+{% endblock %}
