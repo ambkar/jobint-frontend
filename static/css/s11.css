@@ -23,6 +23,7 @@ body {
 
 .block-left {
   position: fixed;
+  width: 50vw;
   display: grid;
   grid-template-rows: 1fr 1fr;
   height: 100%;
@@ -123,6 +124,8 @@ body {
 }
 
 .block-right {
+  position: relative;
+  margin-left: 50vw;
   display: grid;
   grid-template-columns: 0.35fr 1.3fr 0.35fr;
   align-items: center;
