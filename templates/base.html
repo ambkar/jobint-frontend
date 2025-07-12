@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}{% endblock %}</title>
+  <style>
+        html, body {
+            font-family: Actay;
+            margin: 0;
+            padding: 0;
+            background: #f7f8fa;
+            /* Не задавайте height: 100% ! */
+            overflow-x: hidden;
+        }
+        .dashboard-layout {
+            display: flex;
+            flex-direction: row;
+            margin-top: 84px; /* высота header */
+            height: calc(100vh - 84px);
+            min-height: 0;
+        }
+        .main-content {
+            margin-left: 260px; /* ширина sidebar */
+            flex: 1 1 0;
+            min-width: 0;
+            min-height: 0;
+            padding: 40px;
+            background: #f7f8fa;
+            border-radius: 25px 0 0 0;
+            
+            /* Не используйте height: 100vh! */
+            overflow-y: auto;  /* не нужно, если не хотите внутреннего скролла */
+        }
+  </style>
+</head>
+<body style="background: #ffffff;">
+  <header class="dashboard-header">
+    {% include "header.html" %}
+  </header>
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+      {% include "sidebar.html" %}
+    </aside>
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+
+</html>

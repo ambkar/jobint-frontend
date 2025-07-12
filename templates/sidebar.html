@@ -1,0 +1,146 @@
+<aside class="jobint-sidebar">
+  <div class="sidebar-section main">
+    <div class="sidebar-title">НАВИГАЦИЯ</div>
+    <a href="/profile" class="sidebar-link {% if request.path == '/profile' %}active{% endif %}">
+      <span class="sidebar-icon">🏠</span>
+      <span>Профиль</span>
+    </a>
+    <a href="#" class="sidebar-link" data-modal="company">
+      <span class="sidebar-icon">🏢</span>
+      <span>Компания</span>
+    </a>
+    <a href="/analytics" class="sidebar-link">
+      <span class="sidebar-icon">📊</span>
+      <span>Аналитика</span>
+    </a>
+    <a href="/account" class="sidebar-link">
+      <span class="sidebar-icon">👤</span>
+      <span>Аккаунт</span>
+    </a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-title">ФИНАНСЫ</div>
+    <a href="/married-savings" class="sidebar-link">
+      <span class="sidebar-icon">💍</span>
+      <span>Семейные накопления</span>
+    </a>
+    <a href="/emergency-funds" class="sidebar-link">
+      <span class="sidebar-icon">💡</span>
+      <span>Резервный фонд</span>
+    </a>
+  </div>
+  <div class="sidebar-section promo">
+    <div class="sidebar-promo">
+      <div class="promo-img"></div>
+      <div class="promo-text">
+        <div style="font-weight:700;font-size:1.08rem;">Откройте все возможности</div>
+        <div style="color:#7a7e8c;font-size:0.95rem;">20+ метрик</div>
+        <button class="promo-btn">14 дней бесплатно</button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<style>
+.jobint-sidebar {
+  z-index: 50;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px;
+  min-width: 220px;
+  background: #fff;
+  padding: 34px 0 20px 0;
+  box-sizing: border-box;
+  border-right: 1.5px solid #f1f3f6;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-family: 'Actay', Arial, sans-serif;
+}
+
+.sidebar-section {
+  margin-bottom: 18px;
+  padding: 0 20px;
+}
+.sidebar-title {
+  font-size: 0.98rem;
+  color: #b0b4c2;
+  font-weight: 700;
+  margin-bottom: 12px;
+  margin-left: 4px;
+  letter-spacing: 0.5px;
+  font-family: 'Actay Wide', Arial, sans-serif;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  color: #222;
+  font-size: 1.08rem;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 4px;
+  transition: background 0.14s, color 0.14s;
+  font-family: 'Actay', Arial, sans-serif;
+  opacity: 0.88;
+}
+.sidebar-link.active,
+.sidebar-link:hover {
+  background: #eaf1ff;
+  color: #2962ff;
+  opacity: 1;
+}
+.sidebar-icon {
+  font-size: 1.25rem;
+}
+.sidebar-section.promo {
+  margin-top: auto;
+  padding: 0 20px;
+}
+.sidebar-promo {
+  background: #eaf1ff;
+  border-radius: 16px;
+  padding: 18px 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.promo-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 13px;
+  background: #dbe6fa url('/static/images/bg.png') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.promo-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.promo-btn {
+  margin-top: 7px;
+  background: #2962ff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 4px 13px;
+  font-size: 0.99rem;
+  cursor: pointer;
+  font-family: 'Actay Wide', Arial, sans-serif;
+  transition: background 0.13s;
+}
+.promo-btn:hover { background: #1b2fa0; }
+@media (max-width: 900px) {
+  .jobint-sidebar { width: 60px; min-width: 60px; padding: 12px 0;}
+  .sidebar-title, .promo-text, .sidebar-link span:not(.sidebar-icon) { display: none; }
+  .sidebar-link { justify-content: center; padding: 8px 0;}
+  .sidebar-promo { padding: 8px 0; }
+}
+</style>
