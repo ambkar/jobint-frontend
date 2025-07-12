@@ -126,6 +126,7 @@ body {
 .block-right {
   position: relative;
   margin-left: 50vw;
+  width: 50vw;
   display: grid;
   grid-template-columns: 0.35fr 1.3fr 0.35fr;
   align-items: center;
