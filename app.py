@@ -5,7 +5,7 @@ import os
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = os.getenv("SECRET_KEY", "frontendsecret")
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8001/api")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:8001/api")
 
 def get_auth_cookies():
     cookies = {}
