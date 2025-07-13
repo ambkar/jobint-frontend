@@ -9,27 +9,24 @@
             margin: 0;
             padding: 0;
             background: #f7f8fa;
-            /* Не задавайте height: 100% ! */
             overflow-x: hidden;
         }
         .dashboard-layout {
             display: flex;
             flex-direction: row;
-            margin-top: 84px; /* высота header */
+            margin-top: 84px;
             height: calc(100vh - 84px);
             min-height: 0;
         }
         .main-content {
-            margin-left: 260px; /* ширина sidebar */
+            margin-left: 260px;
             flex: 1 1 0;
             min-width: 0;
             min-height: 0;
             padding: 40px;
             background: #f7f8fa;
             border-radius: 25px 0 0 0;
-            
-            /* Не используйте height: 100vh! */
-            overflow-y: auto;  /* не нужно, если не хотите внутреннего скролла */
+            overflow-y: auto;
         }
         .flash-messages {
             margin: 10px 0 0 0;
@@ -50,18 +47,18 @@
   </style>
 </head>
 <body style="background: #ffffff;">
-    <header class="dashboard-header">
-        {% include "header.html" %}
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                <div class="flash-message {{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-        {% endwith %}
-    </header>
+  <header class="dashboard-header">
+    {% include "header.html" %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+  </header>
   <div class="dashboard-layout">
     <aside class="dashboard-sidebar">
       {% include "sidebar.html" %}
@@ -71,5 +68,4 @@
     </main>
   </div>
 </body>
-
 </html>

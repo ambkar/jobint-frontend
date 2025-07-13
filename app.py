@@ -15,17 +15,15 @@ def index():
     if token:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            user = payload.get('user')  # <-- исправлено тут!
+            user = payload.get('user')
         except ExpiredSignatureError:
             pass
         except InvalidTokenError:
             pass
-
     if user:
         return render_template('index_auth.html', user=user)
     else:
         return render_template('index.html')
-
 
 @app.route("/login", methods=["GET"])
 def login_page():
@@ -38,19 +36,16 @@ def register_page():
 @app.route("/auth/login", methods=["POST"])
 def login_api():
     data = request.json
-    # Проксируем запрос на сервис авторизации
     resp = requests.post(f"{AUTH_API}/login", json=data, verify=False)
     response = make_response(resp.text, resp.status_code)
     try:
-        # Пытаемся получить токен из ответа
         token = resp.json().get('token')
         if token:
-            # Устанавливаем токен в cookie (httpOnly и secure для безопасности)
             response.set_cookie(
                 'access_token',
                 token,
                 httponly=True,
-                secure=True,  # Только если у вас HTTPS! Для локальной разработки можно убратьj
+                secure=True,
                 samesite='Lax',
                 domain='.jobint.ru'
             )
@@ -60,13 +55,11 @@ def login_api():
 
 @app.route("/auth/register", methods=["POST"])
 def register_api():
-    # Получаем все поля формы как словарь
     data = request.form.to_dict()
     files = {}
     if 'avatar' in request.files and request.files['avatar'].filename:
         avatar = request.files['avatar']
         files['avatar'] = (avatar.filename, avatar, avatar.mimetype)
-    # Проксируем запрос на сервис авторизации
     resp = requests.post(
         f"{AUTH_API}/register",
         data=data,
@@ -91,7 +84,6 @@ def profile():
     user = None
     if not token:
         return redirect(url_for("login_page"))
-
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         user = payload.get('user')
@@ -99,7 +91,7 @@ def profile():
         return redirect(url_for("login_page"))
 
     if request.method == "POST":
-        # Обновление профиля
+        headers = {"Authorization": f"Bearer {token}"}
         data = {
             "name": request.form.get("name"),
             "surname": request.form.get("surname"),
@@ -107,31 +99,33 @@ def profile():
             "phone": request.form.get("phone"),
             "email": request.form.get("email"),
         }
+        files = {}
         password = request.form.get("password")
         if password:
             data["password"] = password
-
         avatar_file = request.files.get("avatar")
         if avatar_file and avatar_file.filename:
-            import base64
-            data["avatar"] = base64.b64encode(avatar_file.read()).decode("utf-8")
-
-        headers = {"Authorization": f"Bearer {token}"}
-        resp = requests.put(f"{AUTH_API}/profile", json=data, headers=headers, verify=False)
-        if resp.status_code == 200:
-            flash("Профиль обновлён")
-        else:
-            flash(f"Ошибка обновления: {resp.json().get('error', 'Неизвестная ошибка')}")
+            files["avatar"] = (avatar_file.filename, avatar_file.stream, avatar_file.mimetype)
+        try:
+            resp = requests.put(
+                f"{AUTH_API}/profile",
+                data=data,
+                files=files if files else None,
+                headers=headers,
+                timeout=10,
+                verify=False
+            )
+            if resp.status_code == 200:
+                flash("Профиль обновлён", "success")
+            else:
+                flash(f"Ошибка обновления: {resp.json().get('error', 'Неизвестная ошибка')}", "error")
+        except Exception as e:
+            flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
         return redirect(url_for("profile"))
 
-    # Получение текущих данных пользователя (опционально, если нужно отобразить актуальные данные)
     headers = {"Authorization": f"Bearer {token}"}
     resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
-    if resp.status_code == 200:
-        user_data = resp.json()
-    else:
-        user_data = user
-
+    user_data = resp.json() if resp.status_code == 200 else user
     return render_template("profile.html", user=user_data)
 
 @app.route("/profile/delete", methods=["POST"])
@@ -139,16 +133,19 @@ def delete_profile():
     token = request.cookies.get('access_token')
     if not token:
         return redirect(url_for("login_page"))
-
     headers = {"Authorization": f"Bearer {token}"}
-    resp = requests.delete(f"{AUTH_API}/profile", headers=headers, verify=False)
-    response = redirect(url_for("index"))
-    response.delete_cookie("access_token", domain=".jobint.ru", path="/")
-    if resp.status_code == 200:
-        flash("Профиль удалён")
-    else:
-        flash(f"Ошибка удаления: {resp.json().get('error', 'Неизвестная ошибка')}")
-    return response
+    try:
+        resp = requests.delete(f"{AUTH_API}/profile", headers=headers, verify=False)
+        response = redirect(url_for("index"))
+        response.delete_cookie("access_token", domain=".jobint.ru", path="/")
+        if resp.status_code == 200:
+            flash("Профиль удалён", "success")
+        else:
+            flash(f"Ошибка удаления: {resp.json().get('error', 'Неизвестная ошибка')}", "error")
+        return response
+    except Exception as e:
+        flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
+        return redirect(url_for("profile"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
