@@ -82,17 +82,11 @@ def logout():
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     token = request.cookies.get('access_token')
-    user = None
     if not token:
         return redirect(url_for("login_page"))
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        user = payload.get('user')
-    except Exception:
-        return redirect(url_for("login_page"))
+    headers = {"Authorization": f"Bearer {token}"}
 
     if request.method == "POST":
-        headers = {"Authorization": f"Bearer {token}"}
         data = {
             "name": request.form.get("name"),
             "surname": request.form.get("surname"),
@@ -127,11 +121,14 @@ def profile():
                 flash(f"Ошибка обновления: {error_msg}", "error")
         except Exception as e:
             flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
-        return redirect(url_for("profile"))
+        # После изменения профиля сразу получаем актуальные данные
+        resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
+        user_data = resp.json() if resp.status_code == 200 else None
+        return render_template("profile.html", user=user_data)
 
-    headers = {"Authorization": f"Bearer {token}"}
+    # GET-запрос — всегда получаем актуальные данные профиля через /me
     resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
-    user_data = resp.json() if resp.status_code == 200 else user
+    user_data = resp.json() if resp.status_code == 200 else None
     return render_template("profile.html", user=user_data)
 
 @app.route("/profile/delete", methods=["POST"])
