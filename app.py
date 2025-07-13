@@ -7,7 +7,7 @@ SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
 AUTH_API = "https://jobint.ru/api/v1/auth"
 
 app = Flask(__name__)
-app.secret_key = SECRET_KEY  # Обязательно задайте уникальный секрет!
+app.secret_key = SECRET_KEY # Обязательно задайте уникальный секрет!
 
 @app.route("/", methods=["GET"])
 def index():
