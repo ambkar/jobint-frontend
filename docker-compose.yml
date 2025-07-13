@@ -14,3 +14,9 @@ services:
     # Если хотите live reload для разработки:
     # volumes:
     #   - .:/srv
+    networks:
+          - jobint-net
+
+networks:
+  jobint-net:
+    external: true
