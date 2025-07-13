@@ -7,7 +7,7 @@ SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
 AUTH_API = "https://jobint.ru/api/v1/auth"
 
 app = Flask(__name__)
-app.secret_key = SECRET_KEY # Обязательно задайте уникальный секрет!
+app.secret_key = SECRET_KEY  # Обязательно задайте уникальный секрет!
 
 @app.route("/", methods=["GET"])
 def index():
@@ -24,7 +24,6 @@ def index():
             return render_template('index.html')
     except Exception:
         return render_template('index.html')
-
 
 @app.route("/login", methods=["GET"])
 def login_page():
@@ -123,12 +122,12 @@ def profile():
             flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
         # После изменения профиля сразу получаем актуальные данные
         resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
-        user_data = resp.json() if resp.status_code == 200 else None
+        user_data = resp.json().get("user") if resp.status_code == 200 else None
         return render_template("profile.html", user=user_data)
 
     # GET-запрос — всегда получаем актуальные данные профиля через /me
     resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
-    user_data = resp.json() if resp.status_code == 200 else None
+    user_data = resp.json().get("user") if resp.status_code == 200 else None
     return render_template("profile.html", user=user_data)
 
 @app.route("/profile/delete", methods=["POST"])
