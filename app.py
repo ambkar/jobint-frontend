@@ -12,19 +12,19 @@ app.secret_key = SECRET_KEY # Обязательно задайте уникал
 @app.route("/", methods=["GET"])
 def index():
     token = request.cookies.get('access_token')
-    user = None
-    if token:
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            user = payload.get('user')
-        except ExpiredSignatureError:
-            pass
-        except InvalidTokenError:
-            pass
-    if user:
-        return render_template('index_auth.html', user=user)
-    else:
+    if not token:
         return render_template('index.html')
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
+        if resp.status_code == 200:
+            user = resp.json()
+            return render_template('index_auth.html', user=user)
+        else:
+            return render_template('index.html')
+    except Exception:
+        return render_template('index.html')
+
 
 @app.route("/login", methods=["GET"])
 def login_page():
