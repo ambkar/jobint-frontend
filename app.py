@@ -7,6 +7,7 @@ SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
 AUTH_API = "https://jobint.ru/api/v1/auth"
 
 app = Flask(__name__)
+app.secret_key = SECRET_KEY  # Обязательно задайте уникальный секрет!
 
 @app.route("/", methods=["GET"])
 def index():
@@ -118,7 +119,12 @@ def profile():
             if resp.status_code == 200:
                 flash("Профиль обновлён", "success")
             else:
-                flash(f"Ошибка обновления: {resp.json().get('error', 'Неизвестная ошибка')}", "error")
+                try:
+                    error_json = resp.json()
+                    error_msg = error_json.get('error', 'Неизвестная ошибка')
+                except Exception:
+                    error_msg = f"HTTP {resp.status_code}: {resp.text}"
+                flash(f"Ошибка обновления: {error_msg}", "error")
         except Exception as e:
             flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
         return redirect(url_for("profile"))
@@ -141,7 +147,12 @@ def delete_profile():
         if resp.status_code == 200:
             flash("Профиль удалён", "success")
         else:
-            flash(f"Ошибка удаления: {resp.json().get('error', 'Неизвестная ошибка')}", "error")
+            try:
+                error_json = resp.json()
+                error_msg = error_json.get('error', 'Неизвестная ошибка')
+            except Exception:
+                error_msg = f"HTTP {resp.status_code}: {resp.text}"
+            flash(f"Ошибка удаления: {error_msg}", "error")
         return response
     except Exception as e:
         flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
