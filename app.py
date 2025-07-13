@@ -50,7 +50,7 @@ def login_api():
                 'access_token',
                 token,
                 httponly=True,
-                secure=True,  # Только если у вас HTTPS! Для локальной разработки можно убрать
+                secure=True,  # Только если у вас HTTPS! Для локальной разработки можно убратьj
                 samesite='Lax',
                 domain='.jobint.ru'
             )
