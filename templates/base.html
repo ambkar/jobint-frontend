@@ -31,12 +31,37 @@
             /* Не используйте height: 100vh! */
             overflow-y: auto;  /* не нужно, если не хотите внутреннего скролла */
         }
+        .flash-messages {
+            margin: 10px 0 0 0;
+            padding: 0;
+        }
+        .flash-message {
+            padding: 12px 18px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .flash-message.success { background: #e6ffed; color: #237804; border: 1px solid #b7eb8f; }
+        .flash-message.error { background: #fff2f0; color: #a8071a; border: 1px solid #ffa39e; }
+        .flash-message.warning { background: #fffbe6; color: #ad8b00; border: 1px solid #ffe58f; }
+        .flash-message.info { background: #e6f7ff; color: #0050b3; border: 1px solid #91d5ff; }
   </style>
 </head>
 <body style="background: #ffffff;">
-  <header class="dashboard-header">
-    {% include "header.html" %}
-  </header>
+    <header class="dashboard-header">
+        {% include "header.html" %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+    </header>
   <div class="dashboard-layout">
     <aside class="dashboard-sidebar">
       {% include "sidebar.html" %}

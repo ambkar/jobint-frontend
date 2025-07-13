@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response, redirect, url_for
+from flask import Flask, render_template, request, make_response, redirect, url_for, flash
 import jwt
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 import requests
@@ -85,6 +85,70 @@ def logout():
     )
     return response
 
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    token = request.cookies.get('access_token')
+    user = None
+    if not token:
+        return redirect(url_for("login_page"))
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user = payload.get('user')
+    except Exception:
+        return redirect(url_for("login_page"))
+
+    if request.method == "POST":
+        # Обновление профиля
+        data = {
+            "name": request.form.get("name"),
+            "surname": request.form.get("surname"),
+            "patronymic": request.form.get("patronymic"),
+            "phone": request.form.get("phone"),
+            "email": request.form.get("email"),
+        }
+        password = request.form.get("password")
+        if password:
+            data["password"] = password
+
+        avatar_file = request.files.get("avatar")
+        if avatar_file and avatar_file.filename:
+            import base64
+            data["avatar"] = base64.b64encode(avatar_file.read()).decode("utf-8")
+
+        headers = {"Authorization": f"Bearer {token}"}
+        resp = requests.put(f"{AUTH_API}/profile", json=data, headers=headers, verify=False)
+        if resp.status_code == 200:
+            flash("Профиль обновлён")
+        else:
+            flash(f"Ошибка обновления: {resp.json().get('error', 'Неизвестная ошибка')}")
+        return redirect(url_for("profile"))
+
+    # Получение текущих данных пользователя (опционально, если нужно отобразить актуальные данные)
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
+    if resp.status_code == 200:
+        user_data = resp.json()
+    else:
+        user_data = user
+
+    return render_template("profile.html", user=user_data)
+
+@app.route("/profile/delete", methods=["POST"])
+def delete_profile():
+    token = request.cookies.get('access_token')
+    if not token:
+        return redirect(url_for("login_page"))
+
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.delete(f"{AUTH_API}/profile", headers=headers, verify=False)
+    response = redirect(url_for("index"))
+    response.delete_cookie("access_token", domain=".jobint.ru", path="/")
+    if resp.status_code == 200:
+        flash("Профиль удалён")
+    else:
+        flash(f"Ошибка удаления: {resp.json().get('error', 'Неизвестная ошибка')}")
+    return response
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
