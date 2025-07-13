@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>Добро пожаловать!</h2>
+    <form action="{{ url_for('profile') }}">
+        <button type="submit">Профиль</button>
+    </form>
+    <form action="{{ url_for('logout') }}" method="post">
+        <button type="submit">Выйти</button>
+    </form>
+</body>
+</html>

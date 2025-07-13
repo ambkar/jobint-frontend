@@ -1,158 +1,107 @@
-from flask import Flask, render_template, request, make_response, redirect, url_for, flash
-import jwt
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from flask import Flask, render_template, request, redirect, url_for, session, make_response
 import requests
+import os
 
-SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
-AUTH_API = "https://jobint.ru/api/v1/auth"
+app = Flask(__name__, static_folder='static', template_folder='templates')
+app.secret_key = os.getenv("SECRET_KEY", "frontendsecret")
 
-app = Flask(__name__)
-app.secret_key = SECRET_KEY  # Обязательно задайте уникальный секрет!
+BACKEND_URL = os.getenv("BACKEND_URL", "http://0.0.0.0:8001/api")
 
-@app.route("/", methods=["GET"])
-def index():
-    token = request.cookies.get('access_token')
-    if not token:
-        return render_template('index.html')
-    headers = {"Authorization": f"Bearer {token}"}
-    try:
-        resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
-        if resp.status_code == 200:
-            user = resp.json().get("user")
-            return render_template('index_auth.html', user=user)
-        else:
-            return render_template('index.html')
-    except Exception:
-        return render_template('index.html')
+def get_auth_cookies():
+    cookies = {}
+    if 'session' in request.cookies:
+        cookies['session'] = request.cookies.get('session')
+    return cookies
 
-@app.route("/login", methods=["GET"])
-def login_page():
-    return render_template("login.html")
+@app.route('/', methods=['GET'])
+def home():
+    if 'user_id' in session:
+        return render_template('home.html')
+    return redirect(url_for('login'))
 
-@app.route("/register", methods=["GET"])
-def register_page():
-    return render_template("register.html")
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        phone = request.form['phone']
+        resp = requests.post(f"{BACKEND_URL}/login", json={'phone': phone}, cookies=get_auth_cookies())
+        if resp.ok:
+            session['login_phone'] = phone
+            return render_template('code.html', phone=phone, action='login-verify')
+        return render_template('login.html', error="Ошибка отправки кода")
+    return render_template('login.html')
 
-@app.route("/auth/login", methods=["POST"])
-def login_api():
-    data = request.json
-    resp = requests.post(f"{AUTH_API}/login", json=data, verify=False)
-    response = make_response(resp.text, resp.status_code)
-    try:
-        token = resp.json().get('token')
-        if token:
-            response.set_cookie(
-                'access_token',
-                token,
-                httponly=True,
-                secure=True,
-                samesite='Lax',
-                domain='.jobint.ru'
-            )
-    except Exception:
-        pass
-    return response
+@app.route('/login-verify', methods=['POST'])
+def login_verify():
+    code = request.form['code']
+    phone = session.get('login_phone')
+    resp = requests.post(f"{BACKEND_URL}/login-verify", json={'code': code}, cookies=get_auth_cookies())
+    if resp.ok and resp.json().get('status') == 'ok':
+        session['user_id'] = True
+        return redirect(url_for('home'))
+    return render_template('code.html', phone=phone, action='login-verify', error="Неверный код")
 
-@app.route("/auth/register", methods=["POST"])
-def register_api():
-    data = request.form.to_dict()
-    files = {}
-    if 'avatar' in request.files and request.files['avatar'].filename:
-        avatar = request.files['avatar']
-        files['avatar'] = (avatar.filename, avatar, avatar.mimetype)
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        phone = request.form['phone']
+        resp = requests.post(f"{BACKEND_URL}/register", json={'phone': phone}, cookies=get_auth_cookies())
+        if resp.ok:
+            session['reg_phone'] = phone
+            return render_template('code.html', phone=phone, action='verify')
+        return render_template('register.html', error="Ошибка отправки кода")
+    return render_template('register.html')
+
+@app.route('/verify', methods=['POST'])
+def verify():
+    code = request.form['code']
+    phone = session.get('reg_phone')
+    name = request.form.get('name', '')
+    surname = request.form.get('surname', '')
     resp = requests.post(
-        f"{AUTH_API}/register",
-        data=data,
-        files=files if files else None,
-        verify=False
+        f"{BACKEND_URL}/verify",
+        json={'code': code, 'name': name, 'surname': surname},
+        cookies=get_auth_cookies()
     )
-    return (resp.text, resp.status_code, resp.headers.items())
+    if resp.ok and resp.json().get('status') == 'ok':
+        session['user_id'] = True
+        return redirect(url_for('home'))
+    return render_template('code.html', phone=phone, action='verify', error="Неверный код")
 
-@app.route("/logout")
-def logout():
-    response = redirect(url_for("index"))
-    response.delete_cookie(
-        "access_token",
-        domain=".jobint.ru",
-        path="/"
-    )
-    return response
-
-@app.route("/profile", methods=["GET", "POST"])
+@app.route('/profile')
 def profile():
-    token = request.cookies.get('access_token')
-    if not token:
-        return redirect(url_for("login_page"))
-    headers = {"Authorization": f"Bearer {token}"}
+    resp = requests.get(f"{BACKEND_URL}/profile", cookies=get_auth_cookies())
+    if resp.status_code == 200:
+        return render_template('profile.html', **resp.json())
+    return redirect(url_for('login'))
 
-    if request.method == "POST":
+@app.route('/profile-edit', methods=['GET', 'POST'])
+def profile_edit():
+    if request.method == 'POST':
         data = {
-            "name": request.form.get("name"),
-            "surname": request.form.get("surname"),
-            "patronymic": request.form.get("patronymic"),
-            "phone": request.form.get("phone"),
-            "email": request.form.get("email"),
+            'name': request.form['name'],
+            'surname': request.form['surname'],
+            'avatar': request.form['avatar']  # base64 string
         }
-        files = {}
-        password = request.form.get("password")
-        if password:
-            data["password"] = password
-        avatar_file = request.files.get("avatar")
-        if avatar_file and avatar_file.filename:
-            files["avatar"] = (avatar_file.filename, avatar_file.stream, avatar_file.mimetype)
-        try:
-            resp = requests.put(
-                f"{AUTH_API}/profile",
-                data=data,
-                files=files if files else None,
-                headers=headers,
-                timeout=10,
-                verify=False
-            )
-            if resp.status_code == 200:
-                flash("Профиль обновлён", "success")
-            else:
-                try:
-                    error_json = resp.json()
-                    error_msg = error_json.get('error', 'Неизвестная ошибка')
-                except Exception:
-                    error_msg = f"HTTP {resp.status_code}: {resp.text}"
-                flash(f"Ошибка обновления: {error_msg}", "error")
-        except Exception as e:
-            flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
-        # После изменения профиля сразу получаем актуальные данные
-        resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
-        user_data = resp.json().get("user") if resp.status_code == 200 else None
-        return render_template("profile.html", user=user_data)
+        resp = requests.post(f"{BACKEND_URL}/profile", json=data, cookies=get_auth_cookies())
+        if resp.ok:
+            return redirect(url_for('profile'))
+        return render_template('profile_edit.html', error="Ошибка сохранения")
+    resp = requests.get(f"{BACKEND_URL}/profile", cookies=get_auth_cookies())
+    if resp.status_code == 200:
+        return render_template('profile_edit.html', **resp.json())
+    return redirect(url_for('login'))
 
-    # GET-запрос — всегда получаем актуальные данные профиля через /me
-    resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
-    user_data = resp.json().get("user") if resp.status_code == 200 else None
-    return render_template("profile.html", user=user_data)
+@app.route('/delete', methods=['POST'])
+def delete():
+    requests.post(f"{BACKEND_URL}/delete", cookies=get_auth_cookies())
+    session.clear()
+    return redirect(url_for('login'))
 
-@app.route("/profile/delete", methods=["POST"])
-def delete_profile():
-    token = request.cookies.get('access_token')
-    if not token:
-        return redirect(url_for("login_page"))
-    headers = {"Authorization": f"Bearer {token}"}
-    try:
-        resp = requests.delete(f"{AUTH_API}/profile", headers=headers, verify=False)
-        response = redirect(url_for("index"))
-        response.delete_cookie("access_token", domain=".jobint.ru", path="/")
-        if resp.status_code == 200:
-            flash("Профиль удалён", "success")
-        else:
-            try:
-                error_json = resp.json()
-                error_msg = error_json.get('error', 'Неизвестная ошибка')
-            except Exception:
-                error_msg = f"HTTP {resp.status_code}: {resp.text}"
-            flash(f"Ошибка удаления: {error_msg}", "error")
-        return response
-    except Exception as e:
-        flash(f"Ошибка соединения с сервисом авторизации: {e}", "error")
-        return redirect(url_for("profile"))
+@app.route('/logout', methods=['POST'])
+def logout():
+    requests.post(f"{BACKEND_URL}/logout", cookies=get_auth_cookies())
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080, debug=True)

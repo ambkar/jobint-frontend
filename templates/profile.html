@@ -1,17 +1,25 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Профиль пользователя</h2>
-<form method="post" enctype="multipart/form-data">
-    <label>Имя: <input type="text" name="name" value="{{ user.name or '' }}"></label><br>
-    <label>Фамилия: <input type="text" name="surname" value="{{ user.surname or '' }}"></label><br>
-    <label>Отчество: <input type="text" name="patronymic" value="{{ user.patronymic or '' }}"></label><br>
-    <label>Телефон: <input type="text" name="phone" value="{{ user.phone or '' }}"></label><br>
-    <label>Email: <input type="email" name="email" value="{{ user.email or '' }}"></label><br>
-    <label>Пароль: <input type="password" name="password"></label><br>
-    <label>Аватар: <input type="file" name="avatar"></label><br>
-    <button type="submit">Сохранить изменения</button>
-</form>
-<form method="post" action="{{ url_for('delete_profile') }}" onsubmit="return confirm('Удалить профиль? Это действие необратимо.');">
-    <button type="submit" style="color: red;">Удалить профиль</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Профиль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>Профиль</h2>
+    <p>Имя: {{ name }}</p>
+    <p>Фамилия: {{ surname }}</p>
+    <p>Телефон: {{ phone }}</p>
+    {% if avatar %}
+        <img src="data:image/png;base64,{{ avatar }}" alt="Avatar" width="100">
+    {% endif %}
+    <form action="{{ url_for('profile_edit') }}">
+        <button type="submit">Редактировать</button>
+    </form>
+    <form action="{{ url_for('delete') }}" method="post">
+        <button type="submit">Удалить аккаунт</button>
+    </form>
+    <form action="{{ url_for('logout') }}" method="post">
+        <button type="submit">Выйти</button>
+    </form>
+</body>
+</html>

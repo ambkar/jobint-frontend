@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Код подтверждения</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>Введите код, отправленный в Telegram</h2>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form method="post" action="{{ url_for(action) }}">
+        <input type="text" name="code" placeholder="Код" required>
+        {% if action == 'verify' %}
+            <input type="text" name="name" placeholder="Имя" required>
+            <input type="text" name="surname" placeholder="Фамилия" required>
+        {% endif %}
+        <button type="submit">Подтвердить</button>
+    </form>
+</body>
+</html>

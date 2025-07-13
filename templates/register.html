@@ -1,126 +1,16 @@
-{% extends "null.html" %}
-{% block title %}Регистрация{% endblock %}
-{% block content %}
-<div class="container">
-    <div class="block-left">
-        <div class="top-row"></div>
-        <div class="bottom-row">
-            <div class="col-left"></div>
-            <div class="col-center">
-                <div class="jobint-content">
-                    <div class="jobint-title">Jobint</div>
-                    <div class="jobint-subtitle">Виртуальный HR</div>
-                    <div class="jobint-desc">Программный модуль подбора персонала с ИИ</div>
-                    <div class="jobint-steps">
-                        <div class="jobint-step active">
-                            <span class="jobint-step-num">1</span>
-                            <span>Создайте аккаунт</span>
-                        </div>
-                        <div class="jobint-step">
-                            <span class="jobint-step-num">2</span>
-                            <span>Заполните профиль</span>
-                        </div>
-                        <div class="jobint-step">
-                            <span class="jobint-step-num">3</span>
-                            <span>Начните подбор</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-right"></div>
-        </div>
-    </div>
-    <div class="block-right">
-        <div class="login-grid">
-            <div></div>
-            <div>
-                <form class="login-form" id="registerForm" enctype="multipart/form-data">
-                    <h1 class="login-title">Регистрация</h1>
-                    <p class="login-subtitle">
-                        Заполните все поля для создания профиля
-                    </p>
-                    <label class="login-label" for="name">Имя</label>
-                    <input class="login-input" type="text" id="name" name="name" required placeholder="Имя" />
-                    <label class="login-label" for="surname">Фамилия</label>
-                    <input class="login-input" type="text" id="surname" name="surname" required placeholder="Фамилия" />
-                    <label class="login-label" for="patronymic">Отчество</label>
-                    <input class="login-input" type="text" id="patronymic" name="patronymic" required placeholder="Отчество" />
-                    <label class="login-label" for="phone">Телефон</label>
-                    <input class="login-input" type="text" id="phone" name="phone" required placeholder="+7 (999) 999-99-99" />
-                    <label class="login-label" for="email">Email</label>
-                    <input class="login-input" type="email" id="email" name="email" required placeholder="Email" autocomplete="username" />
-                    <label class="login-label" for="password">Пароль</label>
-                    <input class="login-input" type="password" id="password" name="password" required placeholder="Пароль" autocomplete="new-password" />
-                    <label class="login-label" for="password_confirm">Повторите пароль</label>
-                    <input class="login-input" type="password" id="password_confirm" name="password_confirm" required placeholder="Повторите пароль" autocomplete="new-password" />
-                    <div class="avatar-upload-wrapper">
-                        <label class="login-label" for="avatar">Аватар</label>
-                        <label class="avatar-upload-label" id="avatarLabel" for="avatar">
-                            <span class="avatar-placeholder">
-                            <span class="avatar-icon">👤</span>
-                            </span>
-                            <img id="avatarPreview" src="" alt="Предпросмотр аватара" />
-                            <input class="avatar-upload-input" type="file" id="avatar" name="avatar" accept="image/*" />
-                        </label>
-                        <div class="avatar-upload-text">PNG или JPG, до 2 МБ</div>
-                    </div>
-                    <div id="error" class="error-message" style="color: #d00; margin-bottom: 10px;"></div>
-                    <button type="submit" class="login-submit">Зарегистрироваться</button>
-                    <div class="login-bottom">
-                        Уже зарегистрированы?
-                        <a href="/login" class="login-register">Войти</a>
-                    </div>
-                </form>
-            </div>
-            <div></div>
-        </div>
-    </div>
-</div>
-<script>
-document.getElementById('avatar').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  const label = document.getElementById('avatarLabel');
-  const preview = document.getElementById('avatarPreview');
-  if (file && file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      preview.src = ev.target.result;
-      label.classList.add('has-image');
-    };
-    reader.readAsDataURL(file);
-  } else {
-    preview.src = '';
-    label.classList.remove('has-image');
-  }
-});
-</script>
-<script>
-  document.getElementById('registerForm').onsubmit = async function(e) {
-    e.preventDefault();
-    const form = e.target;
-    const password = form.password.value;
-    const password_confirm = form.password_confirm.value;
-    if (password !== password_confirm) {
-      document.getElementById('error').textContent = 'Пароли не совпадают';
-      return;
-    }
-    const formData = new FormData(form);
-    const res = await fetch('/api/v1/auth/register', {
-      method: 'POST',
-      body: formData
-    });
-    let json;
-    try {
-      json = await res.json();
-    } catch (err) {
-      json = {};
-    }
-    if (res.ok && json.token) {
-      localStorage.setItem('jwt_token', json.token);
-      window.location.href = '/';
-    } else {
-      document.getElementById('error').textContent = json.error || 'Ошибка регистрации';
-    }
-  };
-</script>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>Регистрация</h2>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form method="post">
+        <input type="text" name="phone" placeholder="Телефон" required>
+        <button type="submit">Получить код</button>
+    </form>
+    <a href="{{ url_for('login') }}">Уже есть аккаунт? Войти</a>
+</body>
+</html>

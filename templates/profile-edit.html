@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Редактировать профиль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h2>Редактировать профиль</h2>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form method="post">
+        <input type="text" name="name" value="{{ name }}" placeholder="Имя" required>
+        <input type="text" name="surname" value="{{ surname }}" placeholder="Фамилия" required>
+        <input type="text" name="avatar" value="{{ avatar }}" placeholder="Avatar (base64)">
+        <button type="submit">Сохранить</button>
+    </form>
+    <form action="{{ url_for('profile') }}">
+        <button type="submit">Назад</button>
+    </form>
+</body>
+</html>
