@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, session
 import requests
 import os
 
+SECRET_KEY = '732e4de0c7203b17f73ca043a7135da261d3bff7c501a1b1451d6e5f412e2396'
+
 app = Flask(__name__, static_folder='static', template_folder='templates')
-app.secret_key = os.getenv("SECRET_KEY", "frontendsecret")
+app.secret_key = SECRET_KEY
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://auth_service:8001/api")
 
@@ -25,20 +27,23 @@ def login():
         phone = request.form['phone']
         resp = requests.post(f"{BACKEND_URL}/login", json={'phone': phone}, cookies=get_auth_cookies())
         if resp.ok:
-            session['login_phone'] = phone
-            return render_template('code.html', phone=phone, action='login-verify')
+            return render_template('code.html', phone=phone, action='login_verify')
         return render_template('login.html', error="Ошибка отправки кода")
     return render_template('login.html')
 
 @app.route('/login-verify', methods=['POST'])
 def login_verify():
     code = request.form['code']
-    phone = session.get('login_phone')
-    resp = requests.post(f"{BACKEND_URL}/login-verify", json={'code': code}, cookies=get_auth_cookies())
+    phone = request.form['phone']
+    resp = requests.post(
+        f"{BACKEND_URL}/login-verify",
+        json={'phone': phone, 'code': code},
+        cookies=get_auth_cookies()
+    )
     if resp.ok and resp.json().get('status') == 'ok':
         session['user_id'] = True
         return redirect(url_for('home'))
-    return render_template('code.html', phone=phone, action='login-verify', error="Неверный код")
+    return render_template('code.html', phone=phone, action='login_verify', error="Неверный код")
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -46,7 +51,6 @@ def register():
         phone = request.form['phone']
         resp = requests.post(f"{BACKEND_URL}/register", json={'phone': phone}, cookies=get_auth_cookies())
         if resp.ok:
-            session['reg_phone'] = phone
             return render_template('code.html', phone=phone, action='verify')
         return render_template('register.html', error="Ошибка отправки кода")
     return render_template('register.html')
@@ -54,12 +58,12 @@ def register():
 @app.route('/verify', methods=['POST'])
 def verify():
     code = request.form['code']
-    phone = session.get('reg_phone')
+    phone = request.form['phone']
     name = request.form.get('name', '')
     surname = request.form.get('surname', '')
     resp = requests.post(
         f"{BACKEND_URL}/verify",
-        json={'code': code, 'name': name, 'surname': surname},
+        json={'phone': phone, 'code': code, 'name': name, 'surname': surname},
         cookies=get_auth_cookies()
     )
     if resp.ok and resp.json().get('status') == 'ok':

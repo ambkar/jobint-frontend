@@ -8,6 +8,7 @@
     <h2>Введите код, отправленный в Telegram</h2>
     {% if error %}<div class="error">{{ error }}</div>{% endif %}
     <form method="post" action="{{ url_for(action) }}">
+        <input type="hidden" name="phone" value="{{ phone }}">
         <input type="text" name="code" placeholder="Код" required>
         {% if action == 'verify' %}
             <input type="text" name="name" placeholder="Имя" required>
@@ -15,5 +16,6 @@
         {% endif %}
         <button type="submit">Подтвердить</button>
     </form>
+
 </body>
 </html>
