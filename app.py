@@ -18,7 +18,7 @@ def index():
     try:
         resp = requests.get(f"{AUTH_API}/me", headers=headers, verify=False)
         if resp.status_code == 200:
-            user = resp.json()
+            user = resp.json().get("user")
             return render_template('index_auth.html', user=user)
         else:
             return render_template('index.html')
